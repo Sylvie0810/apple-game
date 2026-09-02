@@ -141,13 +141,19 @@ export default function GameBoard({
       >
         {cells.map((cell) => {
           const selected = selection ? inRect(selection, cell.row, cell.col) : false;
+          const hinted = hintRect && !selection ? inRect(hintRect, cell.row, cell.col) : false;
           return (
             <div
               key={cell.id}
               className={`${styles.cell} ${cell.removed ? styles.empty : ''}`}
             >
               {!cell.removed && (
-                <Apple value={cell.value} selected={selected} ready={selected && ready} />
+                <Apple
+                  value={cell.value}
+                  selected={selected}
+                  ready={selected && ready}
+                  hinted={hinted}
+                />
               )}
             </div>
           );

@@ -1,4 +1,4 @@
-import { BOARD, type Cell, type Rect } from './types';
+import { BOARD, type Cell, type Rect } from './types.ts';
 
 export type Point = { x: number; y: number };
 

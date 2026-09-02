@@ -30,6 +30,8 @@ jobs:
 
       - run: npm run typecheck
 
+      - run: npm test
+
       # 저장소 이름이 붙은 하위 경로로 열리므로 basePath 를 넘긴다.
       - run: npm run build
         env:

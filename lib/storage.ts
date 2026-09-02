@@ -1,4 +1,4 @@
-import type { Best, Mode } from './types';
+import type { Best, Mode } from './types.ts';
 
 const BEST_KEY = 'apple-game.best.v1';
 const MODE_KEY = 'apple-game.mode.v1';

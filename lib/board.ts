@@ -1,4 +1,4 @@
-import { BOARD, TOTAL_CELLS, type AppleValue, type Cell } from './types';
+import { BOARD, TOTAL_CELLS, type AppleValue, type Cell } from './types.ts';
 
 /** 시드 고정 난수. 같은 시드 = 같은 판. */
 export function mulberry32(seed: number) {
@@ -28,19 +28,22 @@ function pickValue(rnd: () => number): AppleValue {
   return 9;
 }
 
-/** 전체 합을 10의 배수로 맞춘다 — "다 지울 수 있는 판"에 가깝게. */
+/**
+ * 전체 합을 10의 배수로 맞춘다 — "이론상 전부 지울 수 있는 판"에 가깝게.
+ *
+ * 한 칸에서 한 번에 빼면 안 된다. 남는 수가 9일 때 값 10짜리 사과가 없어
+ * 영원히 못 맞춘다(실제로 seed 3 에서 총합 559 로 실패했다).
+ * 그래서 여러 칸에서 1씩 나눠 뺀다.
+ */
 function normalizeTotal(cells: Cell[], rnd: () => number) {
-  let sum = cells.reduce((acc, c) => acc + c.value, 0);
+  let need = cells.reduce((acc, c) => acc + c.value, 0) % 10;
   let guard = 0;
-  while (sum % 10 !== 0 && guard < 2000) {
+  while (need > 0 && guard < 5000) {
     guard += 1;
-    const diff = sum % 10; // 1..9 만큼 줄이면 배수가 된다
-    const i = Math.floor(rnd() * cells.length);
-    const cell = cells[i];
-    const lowered = cell.value - diff;
-    if (lowered >= 1) {
-      cell.value = lowered as AppleValue;
-      sum -= diff;
+    const cell = cells[Math.floor(rnd() * cells.length)];
+    if (cell.value > 1) {
+      cell.value = (cell.value - 1) as AppleValue;
+      need -= 1;
     }
   }
   return cells;

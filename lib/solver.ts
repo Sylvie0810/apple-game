@@ -1,4 +1,4 @@
-import { BOARD, TARGET, type Cell, type Rect } from './types';
+import { BOARD, TARGET, type Cell, type Rect } from './types.ts';
 
 /**
  * 2D 누적합. removed 셀은 0으로 친다.

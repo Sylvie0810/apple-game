@@ -1,7 +1,7 @@
-import { createBoard, newSeed } from './board';
-import { idsInRect, sumRect } from './selection';
-import { aliveCount, findMove, hasAnyMove } from './solver';
-import { EMPTY_BEST } from './storage';
+import { createBoard, newSeed } from './board.ts';
+import { idsInRect, sumRect } from './selection.ts';
+import { aliveCount, findMove, hasAnyMove } from './solver.ts';
+import { EMPTY_BEST } from './storage.ts';
 import {
   BOARD,
   HINTS_PER_GAME,
@@ -13,7 +13,7 @@ import {
   type Ghost,
   type Mode,
   type Rect,
-} from './types';
+} from './types.ts';
 
 export type Action =
   | { type: 'HYDRATE'; best: Best; mode: Mode }

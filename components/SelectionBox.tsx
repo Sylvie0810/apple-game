@@ -1,4 +1,4 @@
-import { BOARD, type Rect } from '@/lib/types';
+import { BOARD, TARGET, type Rect } from '@/lib/types';
 import styles from './GameBoard.module.css';
 
 type Props = { rect: Rect; ready?: boolean; variant?: 'select' | 'hint' };
@@ -14,6 +14,8 @@ export default function SelectionBox({ rect, ready = false, variant = 'select' }
     <div
       className={cls}
       style={{ left: `${left}%`, top: `${top}%`, width: `${width}%`, height: `${height}%` }}
-    />
+    >
+      {variant === 'hint' && <span className={styles.hintBadge}>= {TARGET}</span>}
+    </div>
   );
 }

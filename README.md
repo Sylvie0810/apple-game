@@ -26,6 +26,7 @@ npm run dev
 | `npm run dev` | 개발 서버 |
 | `npm run build` | 프로덕션 빌드 |
 | `npm run typecheck` | 타입 검사 |
+| `npm test` | 규칙 검증 (힌트 합계, 판 생성, 종료 판정) |
 
 > `npm run build` 는 `.next` 를 갈아엎으므로, 개발 서버를 켜둔 채로 돌리지 않는다.
 
