@@ -4,7 +4,8 @@
   flex-direction: column;
   align-items: center;
   background: var(--bg-start);
-  padding: 8px 20px 24px;
+  padding: clamp(6px, 1.4vh, 14px) 20px clamp(12px, 2.6vh, 24px);
+  min-height: 0;
 }
 
 /* 넓은 화면에서도 폰 폭을 유지한다. 안 그러면 카드와 버튼이 흉하게 늘어난다. */
@@ -14,15 +15,7 @@
   flex: 1;
   display: flex;
   flex-direction: column;
-}
-
-.topRow {
-  display: flex;
-  justify-content: space-between;
-  height: 44px;
-  align-items: center;
-  color: var(--muted);
-  font-size: 22px;
+  min-height: 0;
 }
 
 .center {
@@ -34,9 +27,9 @@
 }
 
 .title {
-  margin: 8px 0 2px;
+  margin: 0 0 2px;
   text-align: center;
-  font-size: 34px;
+  font-size: clamp(24px, 4.2vh, 34px);
   font-weight: 900;
   color: var(--primary);
   -webkit-text-stroke: 1px #fff;
@@ -44,9 +37,9 @@
 }
 
 .subtitle {
-  margin: 0 0 16px;
+  margin: 0 0 clamp(8px, 2vh, 16px);
   text-align: center;
-  font-size: 19px;
+  font-size: clamp(15px, 2.5vh, 19px);
   font-weight: 800;
   color: var(--primary);
   -webkit-text-stroke: 1px #fff;
@@ -56,17 +49,18 @@
 .demoCard {
   background: var(--card);
   border-radius: 18px;
-  padding: 20px 16px 16px;
+  padding: clamp(12px, 2.4vh, 20px) 16px clamp(10px, 1.8vh, 16px);
   box-shadow: 0 2px 10px rgba(0, 0, 0, 0.06);
 }
 
 .demoGrid {
   position: relative;
-  width: 190px;
+  /* 세로가 짧은 화면(인앱 브라우저 등)에서는 데모가 먼저 줄어든다 */
+  width: min(190px, 32vh, 58vw);
   margin: 0 auto;
   display: grid;
   grid-template-columns: repeat(3, 1fr);
-  gap: 6px;
+  gap: clamp(3px, 0.8vh, 6px);
 }
 
 .demoCell {
@@ -161,17 +155,17 @@
 }
 
 .demoHint {
-  margin: 14px 0 0;
+  margin: clamp(8px, 1.8vh, 14px) 0 0;
   text-align: center;
-  font-size: 14px;
+  font-size: clamp(12px, 1.9vh, 14px);
   font-weight: 800;
   color: var(--apple);
 }
 
 .demoSub {
-  margin: 4px 0 0;
+  margin: clamp(2px, 0.5vh, 4px) 0 0;
   text-align: center;
-  font-size: 13px;
+  font-size: clamp(11px, 1.7vh, 13px);
   color: var(--muted);
 }
 
@@ -179,7 +173,7 @@
   display: grid;
   grid-template-columns: 1fr 1fr;
   gap: 12px;
-  margin: 20px 0 16px;
+  margin: clamp(10px, 2.4vh, 20px) 0 clamp(8px, 1.8vh, 16px);
 }
 
 .modeCard {
@@ -187,7 +181,7 @@
   background: var(--card);
   border: 2px solid #e2e6dd;
   border-radius: 16px;
-  padding: 16px 8px;
+  padding: clamp(10px, 2vh, 16px) 8px;
   text-align: center;
   font-weight: 800;
   color: var(--muted);
@@ -200,8 +194,8 @@
 
 .modeIcon {
   display: block;
-  font-size: 22px;
-  margin-bottom: 6px;
+  font-size: clamp(17px, 2.6vh, 22px);
+  margin-bottom: clamp(2px, 0.7vh, 6px);
 }
 
 .check {
@@ -220,19 +214,20 @@
 
 .best {
   text-align: center;
-  font-size: 13px;
+  font-size: clamp(11px, 1.7vh, 13px);
   color: var(--muted);
-  margin-bottom: 12px;
+  margin-bottom: clamp(8px, 1.4vh, 12px);
 }
 
 .startBtn {
   width: 100%;
   background: var(--primary);
   color: #fff;
-  font-size: 19px;
+  font-size: clamp(16px, 2.6vh, 19px);
   font-weight: 800;
   border-radius: 14px;
-  padding: 17px 0;
+  padding: clamp(12px, 2.2vh, 17px) 0;
+  flex: 0 0 auto;
 }
 
 .startBtn:active {

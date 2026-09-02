@@ -19,11 +19,6 @@ export default function StartScreen({ mode, best, onSelectMode, onStart }: Props
   return (
     <div className={styles.screen}>
       <div className={styles.inner}>
-      <div className={styles.topRow}>
-        <span aria-hidden="true">✕</span>
-        <span aria-hidden="true">⚙</span>
-      </div>
-
       <div className={styles.center}>
       <h1 className={styles.title}>사과게임</h1>
       <p className={styles.subtitle}>사과를 합쳐서 10을 만드세요!</p>

@@ -39,7 +39,10 @@ body {
 }
 
 #root-shell {
-  min-height: 100dvh;
+  /* 인앱 브라우저의 위아래 바를 뺀 실제 높이. dvh 미지원 브라우저는 vh 로 떨어진다. */
+  height: 100vh;
+  height: 100dvh;
+  overflow: hidden;
   display: flex;
   flex-direction: column;
   padding: env(safe-area-inset-top) env(safe-area-inset-right)
