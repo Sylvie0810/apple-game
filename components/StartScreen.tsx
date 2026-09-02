@@ -18,6 +18,7 @@ type Props = {
 export default function StartScreen({ mode, best, onSelectMode, onStart }: Props) {
   return (
     <div className={styles.screen}>
+      <div className={styles.inner}>
       <div className={styles.topRow}>
         <span aria-hidden="true">✕</span>
         <span aria-hidden="true">⚙</span>
@@ -76,6 +77,7 @@ export default function StartScreen({ mode, best, onSelectMode, onStart }: Props
       <button className={styles.startBtn} onClick={onStart}>
         게임 시작
       </button>
+      </div>
     </div>
   );
 }

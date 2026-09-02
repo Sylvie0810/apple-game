@@ -2,8 +2,18 @@
   flex: 1;
   display: flex;
   flex-direction: column;
+  align-items: center;
   background: var(--bg-start);
   padding: 8px 20px 24px;
+}
+
+/* 넓은 화면에서도 폰 폭을 유지한다. 안 그러면 카드와 버튼이 흉하게 늘어난다. */
+.inner {
+  width: 100%;
+  max-width: 460px;
+  flex: 1;
+  display: flex;
+  flex-direction: column;
 }
 
 .topRow {
@@ -63,8 +73,12 @@
   aspect-ratio: 1;
 }
 
+/*
+ * 데모는 "규칙을 말없이 가르치는" 장치다. 눈길을 끌려고 깜빡이면 안 된다.
+ * 한 바퀴 8초, 모든 구간이 최소 0.6초 이상이라 깜빡임으로 보이지 않는다.
+ */
 .demoVanish {
-  animation: demoVanish 3.2s ease-in-out infinite;
+  animation: demoVanish 8s ease-in-out infinite;
 }
 
 .demoBox {
@@ -74,52 +88,75 @@
   width: 72%;
   height: 39%;
   border-radius: 8px;
-  animation: demoBox 3.2s ease-in-out infinite;
+  opacity: 0;
+  background: var(--select-fill);
+  border: 2px solid var(--select-line);
+  animation: demoBox 8s ease-in-out infinite;
+  transform-origin: left center;
 }
 
 @keyframes demoBox {
+  /* 손가락이 내려오기 전 */
   0%,
-  8% {
+  4% {
     opacity: 0;
-    width: 6%;
+    width: 14%;
+    background: var(--select-fill);
+    border-color: var(--select-line);
   }
-  22% {
+  /* 오른쪽으로 드래그해 두 칸을 덮는다 */
+  20% {
     opacity: 1;
     width: 72%;
     background: var(--select-fill);
-    border: 2px solid var(--select-line);
+    border-color: var(--select-line);
   }
-  38%,
-  58% {
+  /* 합이 10 — 초록으로 */
+  32%,
+  46% {
     opacity: 1;
     width: 72%;
     background: var(--ready-fill);
-    border: 2px solid var(--ready-line);
+    border-color: var(--ready-line);
   }
-  70%,
+  /* 손을 떼고 사라짐 */
+  56%,
   100% {
     opacity: 0;
     width: 72%;
+    background: var(--ready-fill);
+    border-color: var(--ready-line);
   }
 }
 
 @keyframes demoVanish {
   0%,
-  58% {
+  46% {
     opacity: 1;
     transform: scale(1);
   }
-  66% {
+  54%,
+  84% {
     opacity: 0;
-    transform: scale(0.2);
+    transform: scale(0.3);
   }
-  92% {
-    opacity: 0;
-    transform: scale(0.2);
-  }
+  96%,
   100% {
     opacity: 1;
     transform: scale(1);
+  }
+}
+
+/* 모션을 줄여달라고 한 사용자에게는 애니메이션 대신 결과 상태만 보여준다. */
+@media (prefers-reduced-motion: reduce) {
+  .demoVanish {
+    animation: none;
+  }
+  .demoBox {
+    animation: none;
+    opacity: 1;
+    background: var(--ready-fill);
+    border-color: var(--ready-line);
   }
 }
 

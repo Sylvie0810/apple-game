@@ -55,11 +55,16 @@ button {
   -webkit-tap-highlight-color: transparent;
 }
 
+/*
+ * 모션을 줄여달라는 설정에서 지속시간만 줄이면 무한 반복 애니메이션이
+ * 오히려 빠르게 깜빡인다. 반복 자체를 1회로 끊는다.
+ */
 @media (prefers-reduced-motion: reduce) {
   *,
   *::before,
   *::after {
-    animation-duration: 0.1s !important;
-    transition-duration: 0.1s !important;
+    animation-duration: 0.01ms !important;
+    animation-iteration-count: 1 !important;
+    transition-duration: 0.01ms !important;
   }
 }

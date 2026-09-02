@@ -30,6 +30,7 @@ export default function GameScreen({ state, dispatch }: Props) {
 
   return (
     <div className={styles.screen}>
+      <div className={styles.inner}>
       <HUD
         mode={state.mode}
         running={state.phase === 'playing'}
@@ -60,6 +61,7 @@ export default function GameScreen({ state, dispatch }: Props) {
         onGhostsDone={onGhostsDone}
         onHintDone={onHintDone}
       />
+      </div>
 
       {over && state.overReason && (
         <GameOverModal
