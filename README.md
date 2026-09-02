@@ -39,6 +39,21 @@ lib/         board(판 생성) · selection(좌표→격자) · solver(누적합
 
 핵심은 `components/GameBoard.tsx` 의 포인터 이벤트 3개와 `lib/solver.ts` 의 2D 누적합이다.
 
+## 배포
+
+`main` 에 push 하면 GitHub Actions 가 정적 빌드(`output: 'export'`)해서 GitHub Pages 로 올린다.
+
+- 공개 주소: https://sylvie0810.github.io/apple-game/
+- 워크플로: `.github/workflows/deploy.yml`
+- 하위 경로 대응: 빌드 때 `NEXT_PUBLIC_BASE_PATH=/<저장소이름>` 을 넘긴다
+
+로컬에서 배포본과 똑같이 확인하려면:
+
+```bash
+NEXT_PUBLIC_BASE_PATH=/apple-game npm run build
+npx serve out   # 또는 out 을 apple-game 이라는 폴더로 두고 정적 서버 실행
+```
+
 ## 기획서
 
 [사과게임 모바일 MVP PRD](../../docs/plans/20260902_apple-game_prd_mobile-mvp.md)
