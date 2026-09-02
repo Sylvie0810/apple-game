@@ -1,0 +1,103 @@
+.wrap {
+  flex: 1;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding: 8px 16px 16px;
+  min-height: 0;
+}
+
+.board {
+  position: relative;
+  width: 100%;
+  max-width: 520px;
+  aspect-ratio: var(--cols) / var(--rows);
+  max-height: 100%;
+  display: grid;
+  grid-template-columns: repeat(var(--cols), 1fr);
+  grid-template-rows: repeat(var(--rows), 1fr);
+  touch-action: none;
+  user-select: none;
+  -webkit-user-select: none;
+  -webkit-touch-callout: none;
+  overscroll-behavior: contain;
+}
+
+.cell {
+  position: relative;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding: 4%;
+}
+
+.empty {
+  visibility: hidden;
+}
+
+.selectBox {
+  position: absolute;
+  pointer-events: none;
+  border-radius: 8px;
+  background: var(--select-fill);
+  border: 2px solid var(--select-line);
+  z-index: 2;
+}
+
+.ready {
+  background: var(--ready-fill);
+  border-color: var(--ready-line);
+}
+
+.ghost {
+  position: absolute;
+  pointer-events: none;
+  padding: 4%;
+  z-index: 1;
+  animation: pop 180ms ease-out forwards;
+}
+
+@keyframes pop {
+  0% {
+    transform: scale(1);
+    opacity: 1;
+  }
+  45% {
+    transform: scale(1.15);
+    opacity: 1;
+  }
+  100% {
+    transform: scale(0.2);
+    opacity: 0;
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .ghost {
+    animation: fade 100ms linear forwards;
+  }
+  @keyframes fade {
+    to {
+      opacity: 0;
+    }
+  }
+}
+
+.hintBox {
+  position: absolute;
+  pointer-events: none;
+  border-radius: 8px;
+  border: 3px dashed var(--primary);
+  background: rgba(240, 124, 54, 0.14);
+  z-index: 3;
+  animation: hintPulse 700ms ease-in-out infinite alternate;
+}
+
+@keyframes hintPulse {
+  from {
+    opacity: 0.45;
+  }
+  to {
+    opacity: 1;
+  }
+}

@@ -1,0 +1,65 @@
+:root {
+  --bg-game: #e4efdc;
+  --bg-start: #dff0d2;
+  --apple: #ee3b33;
+  --apple-shadow: #c92c25;
+  --leaf: #7cb342;
+  --ink: #3d4438;
+  --banner: #5a6152;
+  --primary: #f07c36;
+  --primary-press: #d96a29;
+  --card: #ffffff;
+  --muted: #7d8a72;
+  --select-fill: rgba(80, 145, 255, 0.22);
+  --select-line: rgba(80, 145, 255, 0.55);
+  --ready-fill: rgba(65, 190, 105, 0.22);
+  --ready-line: #48be69;
+}
+
+* {
+  box-sizing: border-box;
+}
+
+html,
+body {
+  margin: 0;
+  padding: 0;
+  height: 100%;
+  overscroll-behavior: none;
+}
+
+body {
+  background: var(--bg-game);
+  color: var(--ink);
+  font-family: -apple-system, BlinkMacSystemFont, 'Apple SD Gothic Neo', 'Pretendard',
+    'Segoe UI', Roboto, sans-serif;
+  font-variant-numeric: tabular-nums;
+  word-break: keep-all;
+  -webkit-text-size-adjust: 100%;
+}
+
+#root-shell {
+  min-height: 100dvh;
+  display: flex;
+  flex-direction: column;
+  padding: env(safe-area-inset-top) env(safe-area-inset-right)
+    env(safe-area-inset-bottom) env(safe-area-inset-left);
+}
+
+button {
+  font: inherit;
+  color: inherit;
+  border: none;
+  background: none;
+  cursor: pointer;
+  -webkit-tap-highlight-color: transparent;
+}
+
+@media (prefers-reduced-motion: reduce) {
+  *,
+  *::before,
+  *::after {
+    animation-duration: 0.1s !important;
+    transition-duration: 0.1s !important;
+  }
+}
