@@ -36,6 +36,8 @@ jobs:
       - run: npm run build
         env:
           NEXT_PUBLIC_BASE_PATH: /${{ github.event.repository.name }}
+          # 링크 미리보기(og:image)는 절대 URL 이어야 한다.
+          NEXT_PUBLIC_SITE_URL: https://${{ github.repository_owner }}.github.io
 
       - uses: actions/configure-pages@v5
 

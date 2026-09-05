@@ -5,17 +5,31 @@
   justify-content: center;
   padding: 8px 16px 16px;
   min-height: 0;
+  /* 아래 board 가 이 영역의 '높이'를 기준으로도 줄어들 수 있게 한다. */
+  container-type: size;
 }
 
 .board {
   position: relative;
+  /* 폴백: cqh 를 모르는 브라우저는 이 값을 쓴다. */
   width: 100%;
   max-width: 520px;
+  /*
+   * 세로가 모자란 폰에서 가로만 꽉 채우면 격자가 세로로 눌린다.
+   * 그러면 선택 박스(퍼센트 계산)와 사과 위치가 어긋나 박스가 사과를 가로지른다.
+   * 높이 기준(100cqh)으로도 폭을 줄여 한 칸을 정사각으로 유지한다.
+   */
+  width: min(100%, 520px, calc(100cqh * var(--cols) / var(--rows)));
   aspect-ratio: var(--cols) / var(--rows);
   max-height: 100%;
   display: grid;
-  grid-template-columns: repeat(var(--cols), 1fr);
-  grid-template-rows: repeat(var(--rows), 1fr);
+  /*
+   * 1fr 은 '내용물 최소 크기'에 밀려 균등 분할이 깨진다.
+   * 사과 SVG 가 정사각 비율을 요구해 행 높이가 보드 높이보다 커지고, 격자가 넘쳤다.
+   * minmax(0, 1fr) 이라야 실제로 똑같이 나뉜다.
+   */
+  grid-template-columns: repeat(var(--cols), minmax(0, 1fr));
+  grid-template-rows: repeat(var(--rows), minmax(0, 1fr));
   touch-action: none;
   user-select: none;
   -webkit-user-select: none;

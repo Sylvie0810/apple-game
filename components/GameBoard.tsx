@@ -33,69 +33,165 @@ export default function GameBoard({
   onHintDone,
 }: Props) {
   const boardRef = useRef<HTMLDivElement>(null);
-  const boxRef = useRef<DOMRect | null>(null);
-  const startRef = useRef<Point | null>(null);
-  const pendingRef = useRef<Point | null>(null);
-  const rafRef = useRef<number | null>(null);
   const readyRef = useRef(false);
 
-  const localPoint = (e: React.PointerEvent): Point | null => {
-    const box = boxRef.current;
-    if (!box) return null;
-    return { x: e.clientX - box.left, y: e.clientY - box.top };
-  };
+  // 콜백을 ref 에 담아 두면 네이티브 리스너를 한 번만 붙여도 항상 최신 함수를 부른다.
+  const cb = useRef({ onDragMove, onDragEnd, onDragCancel });
+  cb.current = { onDragMove, onDragEnd, onDragCancel };
 
-  const flush = useCallback(() => {
-    rafRef.current = null;
-    const box = boxRef.current;
-    const start = startRef.current;
-    const now = pendingRef.current;
-    if (!box || !start || !now) return;
-    onDragMove(toRect(start, now, box.width, box.height));
-  }, [onDragMove]);
-
-  const handleDown = (e: React.PointerEvent<HTMLDivElement>) => {
+  /*
+   * 왜 React 의 onPointer* 를 안 쓰나:
+   * 모바일 인앱 브라우저(카카오톡·인스타 등)와 일부 iOS Safari 조합에서
+   * 위임된 passive 리스너로는 브라우저의 스크롤/당겨서 새로고침 제스처를
+   * 막지 못해 드래그가 중간에 취소된다.
+   * 보드 엘리먼트에 직접 { passive: false } 로 붙이고 preventDefault 한다.
+   */
+  useEffect(() => {
     const el = boardRef.current;
     if (!el) return;
-    boxRef.current = el.getBoundingClientRect();
-    const p = localPoint(e);
-    if (!p) return;
-    // 손가락이 보드 밖으로 나가도 드래그를 놓치지 않게 잡아둔다.
-    try {
-      el.setPointerCapture(e.pointerId);
-    } catch {
-      /* 일부 환경에서 캡처가 거부돼도 드래그 자체는 계속된다 */
+
+    let box: DOMRect | null = null;
+    let start: Point | null = null;
+    let pending: Point | null = null;
+    let raf: number | null = null;
+    let activeId: number | null = null;
+
+    const flush = () => {
+      raf = null;
+      if (!box || !start || !pending) return;
+      cb.current.onDragMove(toRect(start, pending, box.width, box.height));
+    };
+
+    const local = (clientX: number, clientY: number): Point | null => {
+      if (!box) return null;
+      return { x: clientX - box.left, y: clientY - box.top };
+    };
+
+    const begin = (clientX: number, clientY: number) => {
+      box = el.getBoundingClientRect();
+      const p = local(clientX, clientY);
+      if (!p) return;
+      start = p;
+      pending = p;
+      flush();
+    };
+
+    const move = (clientX: number, clientY: number) => {
+      if (!start) return;
+      const p = local(clientX, clientY);
+      if (!p) return;
+      pending = p;
+      // 포인터 이벤트는 초당 60~120회 온다. 한 프레임에 한 번만 반영한다.
+      if (raf === null) raf = requestAnimationFrame(flush);
+    };
+
+    const stop = (commit: boolean) => {
+      if (raf !== null) {
+        cancelAnimationFrame(raf);
+        raf = null;
+      }
+      const was = start !== null;
+      start = null;
+      pending = null;
+      activeId = null;
+      if (!was) return;
+      if (commit) cb.current.onDragEnd();
+      else cb.current.onDragCancel();
+    };
+
+    const opts = { passive: false } as const;
+    const cleanups: Array<() => void> = [];
+    const on = (
+      target: EventTarget,
+      type: string,
+      fn: (e: Event) => void,
+      o: AddEventListenerOptions = opts,
+    ) => {
+      target.addEventListener(type, fn as EventListener, o);
+      cleanups.push(() => target.removeEventListener(type, fn as EventListener, o));
+    };
+
+    const hasTouch = typeof window !== 'undefined' && 'ontouchstart' in window;
+
+    if (hasTouch) {
+      // 터치 기기: 터치 이벤트만 쓴다. 포인터 이벤트와 섞으면 중복 처리된다.
+      on(el, 'touchstart', (ev) => {
+        const e = ev as TouchEvent;
+        if (start !== null) return;
+        const t = e.changedTouches[0];
+        if (!t) return;
+        activeId = t.identifier;
+        e.preventDefault(); // 스크롤·당겨서 새로고침·길게눌러 선택 차단
+        begin(t.clientX, t.clientY);
+      });
+      on(el, 'touchmove', (ev) => {
+        const e = ev as TouchEvent;
+        if (start === null) return;
+        const t = Array.from(e.changedTouches).find((x) => x.identifier === activeId);
+        if (!t) return;
+        e.preventDefault();
+        move(t.clientX, t.clientY);
+      });
+      // 손가락이 보드 밖에서 떨어져도 끝을 놓치지 않도록 window 에서 받는다.
+      on(window, 'touchend', (ev) => {
+        const e = ev as TouchEvent;
+        if (start === null) return;
+        if (!Array.from(e.changedTouches).some((x) => x.identifier === activeId)) return;
+        stop(true);
+      });
+      on(window, 'touchcancel', () => stop(false));
+
+      // 터치 기기에서도 마우스가 붙을 수 있다(아이패드+트랙패드, 터치 노트북).
+      on(el, 'mousedown', (ev) => {
+        const e = ev as MouseEvent;
+        if (e.button !== 0 || start !== null) return;
+        e.preventDefault();
+        begin(e.clientX, e.clientY);
+      });
+      on(window, 'mousemove', (ev) => {
+        const e = ev as MouseEvent;
+        if (start === null) return;
+        move(e.clientX, e.clientY);
+      });
+      on(window, 'mouseup', () => {
+        if (start === null) return;
+        stop(true);
+      });
+    } else {
+      on(el, 'pointerdown', (ev) => {
+        const e = ev as PointerEvent;
+        if (e.button !== 0 && e.pointerType === 'mouse') return;
+        if (start !== null) return;
+        activeId = e.pointerId;
+        e.preventDefault();
+        try {
+          el.setPointerCapture(e.pointerId);
+        } catch {
+          /* 캡처가 거부돼도 window 리스너가 이어받는다 */
+        }
+        begin(e.clientX, e.clientY);
+      });
+      on(window, 'pointermove', (ev) => {
+        const e = ev as PointerEvent;
+        if (start === null || e.pointerId !== activeId) return;
+        e.preventDefault();
+        move(e.clientX, e.clientY);
+      });
+      on(window, 'pointerup', (ev) => {
+        const e = ev as PointerEvent;
+        if (start === null || e.pointerId !== activeId) return;
+        stop(true);
+      });
+      on(window, 'pointercancel', () => stop(false));
     }
-    startRef.current = p;
-    pendingRef.current = p;
-    flush();
-  };
 
-  const handleMove = (e: React.PointerEvent<HTMLDivElement>) => {
-    if (!startRef.current) return;
-    const p = localPoint(e);
-    if (!p) return;
-    pendingRef.current = p;
-    // 포인터 이벤트는 초당 60~120회 온다. 한 프레임에 한 번만 반영한다.
-    if (rafRef.current === null) rafRef.current = requestAnimationFrame(flush);
-  };
+    // 탭 전환·앱 전환으로 드래그가 붕 뜨는 것을 막는다.
+    on(window, 'blur', () => stop(false));
+    on(el, 'contextmenu', (e) => e.preventDefault());
 
-  const stopDrag = (commit: boolean) => {
-    if (rafRef.current !== null) {
-      cancelAnimationFrame(rafRef.current);
-      rafRef.current = null;
-    }
-    const wasDragging = startRef.current !== null;
-    startRef.current = null;
-    pendingRef.current = null;
-    if (!wasDragging) return;
-    if (commit) onDragEnd();
-    else onDragCancel();
-  };
-
-  useEffect(() => {
     return () => {
-      if (rafRef.current !== null) cancelAnimationFrame(rafRef.current);
+      if (raf !== null) cancelAnimationFrame(raf);
+      cleanups.forEach((fn) => fn());
     };
   }, []);
 
@@ -121,6 +217,8 @@ export default function GameBoard({
     return () => window.clearTimeout(t);
   }, [hintRect, onHintDone]);
 
+  const noop = useCallback(() => {}, []);
+
   return (
     <div className={styles.wrap}>
       <div
@@ -132,10 +230,7 @@ export default function GameBoard({
             '--rows': BOARD.rows,
           } as React.CSSProperties
         }
-        onPointerDown={handleDown}
-        onPointerMove={handleMove}
-        onPointerUp={() => stopDrag(true)}
-        onPointerCancel={() => stopDrag(false)}
+        onDragStart={noop}
         role="application"
         aria-label="사과 보드. 직사각형으로 드래그해 합이 10인 사과를 지웁니다."
       >
